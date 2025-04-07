@@ -5,7 +5,6 @@ import (
 
 	"github.com/dimbo1324/Base-Go-API-Engine/cmd/api/components"
 	"github.com/dimbo1324/Base-Go-API-Engine/internal"
-
 )
 
 func main() {
@@ -17,5 +16,6 @@ func main() {
 		Config: conf,
 	}
 
-	log.Fatal(app.Run())
+	mux := app.Mount()
+	log.Fatal(app.Run(mux))
 }
