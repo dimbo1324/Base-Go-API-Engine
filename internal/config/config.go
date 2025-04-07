@@ -1,5 +1,6 @@
 package config
 
 const (
-	Port string = ":9090"
+	Port    string = ":8080"
+	KeyName string = "ADDR"
 )
