@@ -4,12 +4,12 @@ import (
 	"log"
 
 	"github.com/dimbo1324/Base-Go-API-Engine/cmd/api/components"
-	"github.com/dimbo1324/Base-Go-API-Engine/internal"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
 )
 
 func main() {
 	conf := components.Config{
-		Addr: internal.Port,
+		Addr: config.Port,
 	}
 
 	app := &components.Application{
