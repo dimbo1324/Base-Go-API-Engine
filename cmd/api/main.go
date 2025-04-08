@@ -24,6 +24,8 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer db.Close()
+	log.Println("Установлен пул подключений к базе данных ...")
 	store := store.NewStorage(db)
 	app := &components.Application{
 		Config: cfg,
