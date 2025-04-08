@@ -14,12 +14,10 @@ func main() {
 		Addr: env.GetString(config.KeyName, config.Port),
 	}
 	store := store.NewStorage(nil)
-
 	app := &components.Application{
 		Config: cfg,
 		Store:  store,
 	}
-
 	mux := app.Mount()
 	log.Fatal(app.Run(mux))
 }

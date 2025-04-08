@@ -12,7 +12,6 @@ func GetString(key, fallBack string) string {
 	}
 	return val
 }
-
 func GetInt(key string, fallBack int) int {
 	val, ok := os.LookupEnv(key)
 	if !ok {
