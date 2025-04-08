@@ -38,4 +38,6 @@ func (a *Application) Run(mux *chi.Mux) error {
 
 func (a *Application) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK: healthCheckHandler сработал"))
+	// ? will think about it:
+	// !a.Store.Posts.Create(r.Context())
 }
