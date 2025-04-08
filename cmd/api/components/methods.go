@@ -17,7 +17,7 @@ func (app *Application) Mount() *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Route("/v1", func(r chi.Router) {
-		r.Get("/health", app.healthCheckHandler)
+		r.Get("/status", app.statusCheckHandler)
 	})
 	return r
 }
@@ -32,6 +32,6 @@ func (a *Application) Run(mux *chi.Mux) error {
 	log.Printf("Сервер запущен на %s", a.Config.Addr)
 	return srv.ListenAndServe()
 }
-func (a *Application) healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+func (a *Application) statusCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK: it works"))
 }
