@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
 	"github.com/lib/pq"
 )
 
@@ -21,7 +22,7 @@ type PostStore struct {
 }
 
 func (s *PostStore) Create(ctx context.Context, post *Post) error {
-	query := `INSERT INTO posts (user_id, title, content) VALUES ($1, $2, $3, $4) returning id, created_at, updated_at`
+	query := config.QUERY_STR
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
