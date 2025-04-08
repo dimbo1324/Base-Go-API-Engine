@@ -12,7 +12,6 @@ type Config struct {
 	Addr string
 	DB   DBConfig
 }
-
 type Application struct {
 	Config Config
 	Store  store.Storage
