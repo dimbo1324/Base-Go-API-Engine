@@ -1,5 +1,3 @@
-Изучи внимательно мой проект. Сделай глубокий анализ. 
-Ответь, можно ли его улучшить немного, использовав лучшие практики разработки Go.
 ----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\.air.toml -----
 root = "."
 testdata_dir = "testdata"
@@ -73,6 +71,12 @@ github.com/go-chi/chi/v5 v5.2.1 h1:KOIHODQj58PmL80G2Eak4WdvUzjSJSm0vG72crDCqb8=
 github.com/go-chi/chi/v5 v5.2.1/go.mod h1:L2yAIGWB3H+phAw1NxKwWM+7eUH/lU8pOMm5hHcoops=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\.vscode\settings.json -----
+{
+"BracketHighlighter.enableExtension": true
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\bin\main.exe -----
+Ошибка чтения файла: 'utf-8' codec can't decode byte 0x90 in position 2: invalid start byte
 ----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\api\main.go -----
 package main
 import (
@@ -169,7 +173,7 @@ IDLE          string = "DB_MAX_IDLE_CONNS"
 IDLE_TIME     string = "DB_MAX_IDLE_TIME_MINS"
 OPEN_VAL      int    = 100
 IDLE_VAL      int    = 100
-IDLE_TIME_VAL string = "15"
+IDLE_TIME_VAL string = "15m"
 QUERY_STR     string = `INSERT INTO posts (user_id, title, content) VALUES ($1, $2, $3, $4) returning id, created_at, updated_at`
 )
 ----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\db\db.go -----
@@ -226,22 +230,9 @@ return valAsInt
 package store
 import (
 "context"
-"database/sql"
 "github.com/dimbo1324/Base-Go-API-Engine/internal/config"
 "github.com/lib/pq"
 )
-type Post struct {
-Id        int64    `json:"id"`
-UserId    int64    `json:"user_id"`
-Content   string   `json:"content"`
-Title     string   `json:"title"`
-CreatedAt string   `json:"created_at"`
-UpdatedAt string   `json:"updated_at"`
-Tags      []string `json:"tags"`
-}
-type PostStore struct {
-db *sql.DB
-}
 func (s *PostStore) Create(ctx context.Context, post *Post) error {
 query := config.QUERY_STR
 err := s.db.QueryRowContext(
@@ -264,9 +255,32 @@ return nil
 ----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\storage.go -----
 package store
 import (
+"database/sql"
+)
+func NewStorage(db *sql.DB) Storage {
+return Storage{
+Posts: &PostStore{db},
+Users: &UsersStore{db},
+}
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\types.go -----
+package store
+import (
 "context"
 "database/sql"
 )
+type PostStore struct {
+db *sql.DB
+}
+type Post struct {
+Id        int64    `json:"id"`
+UserId    int64    `json:"user_id"`
+Content   string   `json:"content"`
+Title     string   `json:"title"`
+CreatedAt string   `json:"created_at"`
+UpdatedAt string   `json:"updated_at"`
+Tags      []string `json:"tags"`
+}
 type Storage struct {
 Posts interface {
 Create(context.Context, *Post) error
@@ -275,21 +289,14 @@ Users interface {
 Create(context.Context) error
 }
 }
-func NewStorage(db *sql.DB) Storage {
-return Storage{
-Posts: &PostStore{db},
-Users: &UsersStore{db},
-}
+type UsersStore struct {
+db *sql.DB
 }
 ----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\users.go -----
 package store
 import (
 "context"
-"database/sql"
 )
-type UsersStore struct {
-db *sql.DB
-}
 func (s *UsersStore) Create(ctx context.Context) error {
 return nil
 }
