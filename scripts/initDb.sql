@@ -1,1 +1,1 @@
-CREATE DATABASE go_api_db;
+CREATE DATABASE networkdb;
