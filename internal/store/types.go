@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+
 )
 
 type PostStore struct {
@@ -17,12 +18,19 @@ type Post struct {
 	UpdatedAt string   `json:"updated_at"`
 	Tags      []string `json:"tags"`
 }
+type User struct {
+	ID        int64  `json:"id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Password  string `json:"-"`
+	CreatedAt string `json:"created_at"`
+}
 type Storage struct {
 	Posts interface {
 		Create(context.Context, *Post) error
 	}
 	Users interface {
-		Create(context.Context) error
+		Create(context.Context, *User) error
 	}
 }
 type UsersStore struct {
