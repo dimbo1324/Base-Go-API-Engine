@@ -10,6 +10,6 @@ const (
 	IDLE_TIME     string = "DB_MAX_IDLE_TIME_MINS"
 	OPEN_VAL      int    = 100
 	IDLE_VAL      int    = 100
-	IDLE_TIME_VAL string = "15"
+	IDLE_TIME_VAL string = "15m"
 	QUERY_STR     string = `INSERT INTO posts (user_id, title, content) VALUES ($1, $2, $3, $4) returning id, created_at, updated_at`
 )
