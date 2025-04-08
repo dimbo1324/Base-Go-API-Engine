@@ -12,12 +12,12 @@ import (
 
 func main() {
 	cfg := components.Config{
-		Addr: env.GetString(config.KeyName, config.Port),
+		Addr: env.GetString(config.ADDR, config.PORT),
 		DB: components.DBConfig{
-			Addr:            env.GetString("DB_ADDR", "postgres://admin:admin_password@localhost/go_api_db?sslmode=disable"),
-			MaxOpenConns:    env.GetInt("DB_MAX_OPEN_CONNS", 100),
-			MaxIdleConns:    env.GetInt("DB_MAX_IDLE_CONNS", 100),
-			MaxIdleTimeMins: env.GetString("DB_MAX_IDLE_TIME_MINS", "15"),
+			Addr:            env.GetString(config.DB_ADDR, config.DB_WAY),
+			MaxOpenConns:    env.GetInt(config.OPEN, config.OPEN_VAL),
+			MaxIdleConns:    env.GetInt(config.IDLE, config.IDLE_VAL),
+			MaxIdleTimeMins: env.GetString(config.IDLE_TIME, config.IDLE_TIME_VAL),
 		},
 	}
 	db, err := db.New(cfg.DB.Addr, cfg.DB.MaxOpenConns, cfg.DB.MaxIdleConns, cfg.DB.MaxIdleTimeMins)
