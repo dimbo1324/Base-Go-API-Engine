@@ -5,6 +5,7 @@ import (
 
 	"github.com/dimbo1324/Base-Go-API-Engine/cmd/api/components"
 	"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/db"
 	"github.com/dimbo1324/Base-Go-API-Engine/internal/env"
 	"github.com/dimbo1324/Base-Go-API-Engine/internal/store"
 )
@@ -12,8 +13,20 @@ import (
 func main() {
 	cfg := components.Config{
 		Addr: env.GetString(config.KeyName, config.Port),
+		DB: components.DBConfig{
+			Addr:            env.GetString("DB_ADDR", "postgres://user:admin_password@localhost/db_name?sslmode=disable"),
+			MaxOpenConns:    env.GetInt("DB_MAX_OPEN_CONNS", 100),
+			MaxIdleConns:    env.GetInt("DB_MAX_IDLE_CONNS", 100),
+			MaxIdleTimeMins: env.GetString("DB_MAX_IDLE_TIME_MINS", "15"),
+		},
 	}
-	store := store.NewStorage(nil)
+
+	db, err := db.New(cfg.DB.Addr, cfg.DB.MaxOpenConns, cfg.DB.MaxIdleConns, cfg.DB.MaxIdleTimeMins)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	store := store.NewStorage(db)
 	app := &components.Application{
 		Config: cfg,
 		Store:  store,
