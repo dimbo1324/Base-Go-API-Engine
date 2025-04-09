@@ -2,14 +2,14 @@ version: '3.8'
 services:
   db:
     image: postgres:16.3
-    container_name: postgres-db
+    container_name: app-db
     environment:
-      POSTGRES_DB: networkdb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 545687
+      POSTGRES_DB: ${DB_NAME:appdb}
+      POSTGRES_USER: ${DB_USER:postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT:5432}:5432"
 volumes:
   db-data:
