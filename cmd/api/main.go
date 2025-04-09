@@ -17,7 +17,7 @@ func main() {
 			Addr:            env.GetString(config.DB_ADDR, config.DEFAULT_DB_ADDR),
 			MaxOpenConns:    env.GetInt(config.DB_MAX_OPEN_CONNS, config.DEFAULT_MAX_OPEN_CONNS),
 			MaxIdleConns:    env.GetInt(config.DB_MAX_IDLE_CONNS, config.DEFAULT_MAX_IDLE_CONNS),
-			MaxIdleTimeMins: env.GetString(config.DB_MAX_IDLE_TIME, config.DEFAULT_MAX_IDLE_TIME),
+			MaxIdleTimeMins: env.GetString(config.DB_CONN_MAX_IDLE_TIME, config.DEFAULT_DB_CONN_MAX_IDLE_TIME),
 		},
 	}
 	dbConn, err := db.New(cfg.DB.Addr, cfg.DB.MaxOpenConns, cfg.DB.MaxIdleConns, cfg.DB.MaxIdleTimeMins)
