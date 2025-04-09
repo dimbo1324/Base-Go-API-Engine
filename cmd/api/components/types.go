@@ -1,6 +1,6 @@
 package components
 
-import "github.com/example/universal-api-engine/internal/store"
+import "github.com/dimbo1324/Base-Go-API-Engine/internal/store"
 
 type DBConfig struct {
 	Addr            string

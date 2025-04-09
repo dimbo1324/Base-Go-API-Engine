@@ -1,0 +1,331 @@
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\.air.toml -----
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "bin"
+[build]
+args_bin = []
+bin = "./bin/main.exe"  
+cmd = "go build -o ./bin/main.exe ./cmd/api"  
+delay = 1000
+exclude_dir = ["assets", "bin", "vendor", "testdata", "web", "docs", "script"]
+exclude_file = []
+exclude_regex = ["_test.go"]
+exclude_unchanged = false
+follow_symlink = false
+full_bin = ""
+include_dir = []
+include_ext = ["go", "tpl", "tmpl", "html"]
+include_file = []
+kill_delay = "0s"
+log = "build-errors.log"
+poll = false
+poll_interval = 0
+post_cmd = []
+pre_cmd = []
+rerun = false
+rerun_delay = 500
+send_interrupt = false
+stop_on_error = false
+[color]
+app = ""
+build = "yellow"
+main = "magenta"
+runner = "green"
+watcher = "cyan"
+[log]
+main_only = false
+silent = false
+time = false
+[misc]
+clean_on_exit = false
+[proxy]
+app_port = 0
+enabled = false
+proxy_port = 0
+[screen]
+clear_on_rebuild = false
+keep_scroll = true
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\.vscode\settings.json -----
+{
+"BracketHighlighter.enableExtension": true
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\api\main.go -----
+package main
+import (
+"log"
+"github.com/dimbo1324/Base-Go-API-Engine/cmd/api/components"
+"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
+"github.com/dimbo1324/Base-Go-API-Engine/internal/db"
+"github.com/dimbo1324/Base-Go-API-Engine/internal/env"
+"github.com/dimbo1324/Base-Go-API-Engine/internal/store"
+)
+func main() {
+cfg := components.Config{
+Addr: env.GetString(config.ADDR, config.DEFAULT_PORT),
+DB: components.DBConfig{
+Addr:            env.GetString(config.DB_ADDR, config.DEFAULT_DB_ADDR),
+MaxOpenConns:    env.GetInt(config.DB_MAX_OPEN_CONNS, config.DEFAULT_MAX_OPEN_CONNS),
+MaxIdleConns:    env.GetInt(config.DB_MAX_IDLE_CONNS, config.DEFAULT_MAX_IDLE_CONNS),
+MaxIdleTimeMins: env.GetString(config.DB_MAX_IDLE_TIME, config.DEFAULT_MAX_IDLE_TIME),
+},
+}
+dbConn, err := db.New(cfg.DB.Addr, cfg.DB.MaxOpenConns, cfg.DB.MaxIdleConns, cfg.DB.MaxIdleTimeMins)
+if err != nil {
+log.Fatalf("Ошибка подключения к базе данных: %v", err)
+}
+defer dbConn.Close()
+store := store.NewStorage(dbConn)
+app := &components.Application{
+Config: cfg,
+Store:  store,
+}
+mux := app.Mount()
+if err := app.Run(mux); err != nil {
+log.Fatalf("Ошибка запуска сервера: %v", err)
+}
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\api\components\methods.go -----
+package components
+import (
+"log"
+"net/http"
+"time"
+"github.com/go-chi/chi/v5"
+"github.com/go-chi/chi/v5/middleware"
+)
+func (app *Application) Mount() *chi.Mux {
+r := chi.NewRouter()
+r.Use(middleware.RequestID)
+r.Use(middleware.RealIP)
+r.Use(middleware.Logger)
+r.Use(middleware.Recoverer)
+r.Use(middleware.Timeout(60 * time.Second))
+r.Route("/v1", func(r chi.Router) {
+r.Get("/status", app.statusCheckHandler)
+})
+return r
+}
+func (app *Application) Run(mux *chi.Mux) error {
+srv := &http.Server{
+Addr:         app.Config.Addr,
+Handler:      mux,
+WriteTimeout: 30 * time.Second,
+ReadTimeout:  10 * time.Second,
+IdleTimeout:  60 * time.Second,
+}
+log.Printf("Сервер запущен на %s", app.Config.Addr)
+return srv.ListenAndServe()
+}
+func (app *Application) statusCheckHandler(w http.ResponseWriter, r *http.Request) {
+if _, err := w.Write([]byte("OK")); err != nil {
+log.Printf("Ошибка ответа: %v", err)
+http.Error(w, "Ошибка сервера", http.StatusInternalServerError)
+}
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\api\components\types.go -----
+package components
+import "github.com/dimbo1324/Base-Go-API-Engine/internal/store"
+type DBConfig struct {
+Addr            string
+MaxOpenConns    int
+MaxIdleConns    int
+MaxIdleTimeMins string
+}
+type Config struct {
+Addr string
+DB   DBConfig
+}
+type Application struct {
+Config Config
+Store  store.Storage
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\migrate\migrations\000001_create_users.down.sql -----
+DROP TABLE IF EXISTS users;
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\cmd\migrate\migrations\000001_create_users.up.sql -----
+CREATE EXTENSION IF NOT EXISTS citext;
+CREATE TABLE
+IF NOT EXISTS users (
+id bigserial PRIMARY KEY,
+email citext UNIQUE NOT NULL,
+username varchar(255) UNIQUE NOT NULL,
+password bytea NOT NULL,
+created_at timestamp(0)
+with
+time zone NOT NULL DEFAULT NOW ()
+);
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\config\config.go -----
+package config
+const (
+ADDR         = "ADDR"
+DEFAULT_PORT = ":8080"
+)
+const (
+DB_ADDR         = "DB_WAY"
+DEFAULT_DB_ADDR = "postgres://postgres:545687@localhost/appdb?sslmode=disable"
+)
+const (
+DB_MAX_OPEN_CONNS      = "DB_MAX_OPEN_CONNS"
+DEFAULT_MAX_OPEN_CONNS = 100
+)
+const (
+DB_MAX_IDLE_CONNS      = "DB_MAX_IDLE_CONNS"
+DEFAULT_MAX_IDLE_CONNS = 100
+)
+const (
+DB_MAX_IDLE_TIME      = "DB_MAX_IDLE_TIME"
+DEFAULT_MAX_IDLE_TIME = "15m"
+)
+const (
+QUERY_STR string = `INSERT INTO posts (user_id, title, content) VALUES ($1, $2, $3, $4) returning id, created_at, updated_at`
+)
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\db\db.go -----
+package db
+import (
+"context"
+"database/sql"
+"time"
+_ "github.com/lib/pq"
+)
+func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.DB, error) {
+db, err := sql.Open("postgres", addr)
+if err != nil {
+return nil, err
+}
+db.SetMaxOpenConns(maxOpenConns)
+db.SetMaxIdleConns(maxIdleConns)
+duration, err := time.ParseDuration(maxIdleTime)
+if err != nil {
+return nil, err
+}
+db.SetConnMaxIdleTime(duration)
+ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+defer cancel()
+if err := db.PingContext(ctx); err != nil {
+db.Close()
+return nil, err
+}
+return db, nil
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\env\env.go -----
+package env
+import (
+"os"
+"strconv"
+)
+func GetString(key, fallBack string) string {
+val, ok := os.LookupEnv(key)
+if !ok {
+return fallBack
+}
+return val
+}
+func GetInt(key string, fallBack int) int {
+val, ok := os.LookupEnv(key)
+if !ok {
+return fallBack
+}
+valAsInt, err := strconv.Atoi(val)
+if err != nil {
+return fallBack
+}
+return valAsInt
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\posts.go -----
+package store
+import (
+"context"
+"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
+"github.com/lib/pq"
+)
+func (s *PostStore) Create(ctx context.Context, post *Post) error {
+query := config.QUERY_STR
+err := s.db.QueryRowContext(
+ctx,
+query,
+post.UserId,
+post.Title,
+post.Content,
+pq.Array(post.Tags),
+).Scan(
+&post.Id,
+&post.CreatedAt,
+&post.UpdatedAt,
+)
+if err != nil {
+return err
+}
+return nil
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\storage.go -----
+package store
+import (
+"database/sql"
+)
+func NewStorage(db *sql.DB) Storage {
+return Storage{
+Posts: &PostStore{db},
+Users: &UsersStore{db},
+}
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\types.go -----
+package store
+import (
+"context"
+"database/sql"
+)
+type PostStore struct {
+db *sql.DB
+}
+type Post struct {
+Id        int64    `json:"id"`
+UserId    int64    `json:"user_id"`
+Content   string   `json:"content"`
+Title     string   `json:"title"`
+CreatedAt string   `json:"created_at"`
+UpdatedAt string   `json:"updated_at"`
+Tags      []string `json:"tags"`
+}
+type User struct {
+ID        int64  `json:"id"`
+Username  string `json:"username"`
+Email     string `json:"email"`
+Password  string `json:"-"`
+CreatedAt string `json:"created_at"`
+}
+type Storage struct {
+Posts interface {
+Create(context.Context, *Post) error
+}
+Users interface {
+Create(context.Context, *User) error
+}
+}
+type UsersStore struct {
+db *sql.DB
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\internal\store\users.go -----
+package store
+import (
+"context"
+"golang.org/x/crypto/bcrypt"
+)
+func (s *UsersStore) Create(ctx context.Context, user *User) error {
+hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+if err != nil {
+return err
+}
+query := `
+INSERT INTO users (username, password, email)
+VALUES ($1, $2, $3)
+RETURNING id, created_at
+`
+err = s.db.QueryRowContext(ctx, query, user.Username, hashedPassword, user.Email).
+Scan(&user.ID, &user.CreatedAt)
+if err != nil {
+return err
+}
+return nil
+}
+----- Файл: C:\Users\Разработчик\Desktop\Личка\Base-Go-API-Engine\scripts\initDb.sql -----
+CREATE DATABASE appdb;
+CREATE EXTENSION IF NOT EXISTS citext;

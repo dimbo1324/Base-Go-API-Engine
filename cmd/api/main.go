@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"github.com/example/universal-api-engine/cmd/api/components"
-	"github.com/example/universal-api-engine/internal/config"
-	"github.com/example/universal-api-engine/internal/db"
-	"github.com/example/universal-api-engine/internal/env"
-	"github.com/example/universal-api-engine/internal/store"
+	"github.com/dimbo1324/Base-Go-API-Engine/cmd/api/components"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/db"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/env"
+	"github.com/dimbo1324/Base-Go-API-Engine/internal/store"
 )
 
 func main() {
