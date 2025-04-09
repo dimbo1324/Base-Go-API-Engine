@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 	"database/sql"
-
 )
 
 type PostStore struct {

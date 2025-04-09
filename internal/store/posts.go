@@ -3,7 +3,7 @@ package store
 import (
 	"context"
 
-	"github.com/dimbo1324/Base-Go-API-Engine/internal/config"
+	"github.com/example/universal-api-engine/internal/config"
 	"github.com/lib/pq"
 )
 
