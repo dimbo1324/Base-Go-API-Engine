@@ -12,12 +12,12 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
-		post.UserId,
+		post.UserID,
 		post.Title,
 		post.Content,
 		pq.Array(post.Tags),
 	).Scan(
-		&post.Id,
+		&post.ID,
 		&post.CreatedAt,
 		&post.UpdatedAt,
 	)
