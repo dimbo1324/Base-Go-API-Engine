@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"time"
 
-	_ "github.com/lib/pq" // Драйвер PostgreSQL
+	_ "github.com/lib/pq"
 )
 
-// New создает новое подключение к базе данных
 func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", addr)
 	if err != nil {
@@ -21,7 +20,6 @@ func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime string) (*sql.
 		return nil, err
 	}
 	db.SetConnMaxIdleTime(duration)
-	// Проверка подключения
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
