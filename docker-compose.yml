@@ -4,9 +4,9 @@ services:
     image: postgres:16.3
     container_name: postgres-db
     environment:
-      POSTGRES_DB: networkdb
+      POSTGRES_DB: appdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 545687
+      POSTGRES_PASSWORD: password
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:

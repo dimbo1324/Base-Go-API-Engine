@@ -14,7 +14,7 @@ func main() {
 	cfg := components.Config{
 		Addr: env.GetString(config.ADDR, config.PORT),
 		DB: components.DBConfig{
-			Addr:            env.GetString(config.DB_ADDR, config.DB_WAY),
+			Addr:            env.GetString(config.DB_ADDR, config.DB_ADDR_VAL),
 			MaxOpenConns:    env.GetInt(config.OPEN, config.OPEN_VAL),
 			MaxIdleConns:    env.GetInt(config.IDLE, config.IDLE_VAL),
 			MaxIdleTimeMins: env.GetString(config.IDLE_TIME, config.IDLE_TIME_VAL),

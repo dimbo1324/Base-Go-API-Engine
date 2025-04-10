@@ -4,7 +4,7 @@ const (
 	PORT          string = ":8080"
 	ADDR          string = "ADDR"
 	DB_ADDR       string = "DB_ADDR"
-	DB_WAY        string = "postgres://postgres:545687@localhost/networkdb?sslmode=disable"
+	DB_ADDR_VAL   string = "postgres://postgres:password@localhost/appdb?sslmode=disable"
 	OPEN          string = "DB_MAX_OPEN_CONNS"
 	IDLE          string = "DB_MAX_IDLE_CONNS"
 	IDLE_TIME     string = "DB_MAX_IDLE_TIME_MINS"
