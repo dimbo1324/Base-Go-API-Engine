@@ -19,7 +19,6 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	).Scan(
 		&post.Id,
 		&post.CreatedAt,
-		&post.UpdatedAt,
 	)
 	if err != nil {
 		return err

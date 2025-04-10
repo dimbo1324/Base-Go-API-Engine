@@ -11,6 +11,5 @@ const (
 	OPEN_VAL      int    = 100
 	IDLE_VAL      int    = 100
 	IDLE_TIME_VAL string = "15m"
-	QUERY_STR     string = `  INSERT INTO posts (user_id, title, content, tags) VALUES ($1, $2, $3, $4) RETURNING id, created_at, updated_at
-`
+	QUERY_STR     string = `INSERT INTO posts (user_id, title, content, tags) VALUES ($1, $2, $3, $4) returning id, created_at`
 )
