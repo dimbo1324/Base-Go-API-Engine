@@ -186,4 +186,3 @@ go build -o bin/main.exe ./cmd/api
 
 MIT
 
-```
